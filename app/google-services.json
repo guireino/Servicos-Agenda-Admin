@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "954953009622",
+    "firebase_url": "https://servicos-agenda-9850a-default-rtdb.firebaseio.com",
+    "project_id": "servicos-agenda-9850a",
+    "storage_bucket": "servicos-agenda-9850a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954953009622:android:f02a8945070f9bff1a7c77",
+        "android_client_info": {
+          "package_name": "com.example.servicosagenda"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "954953009622-t6gk2oiqe357ieno4ud38up37me2t0la.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.servicosagenda",
+            "certificate_hash": "c25dbd5d204add08287974bbe9704f2f0de27244"
+          }
+        },
+        {
+          "client_id": "954953009622-31pk30kdio602a4dvhlt7bsf9lcgmdb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJLEQCULegQ3s_zbOpletbfhzwderKmJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954953009622-31pk30kdio602a4dvhlt7bsf9lcgmdb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:954953009622:android:f09633ddb5f447fc1a7c77",
+        "android_client_info": {
+          "package_name": "com.example.servicosagendaadministrador"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "954953009622-mc3pttnevh83vg17dll3v4cispnhshi4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.servicosagendaadministrador",
+            "certificate_hash": "c25dbd5d204add08287974bbe9704f2f0de27244"
+          }
+        },
+        {
+          "client_id": "954953009622-31pk30kdio602a4dvhlt7bsf9lcgmdb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJLEQCULegQ3s_zbOpletbfhzwderKmJQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "954953009622-31pk30kdio602a4dvhlt7bsf9lcgmdb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
