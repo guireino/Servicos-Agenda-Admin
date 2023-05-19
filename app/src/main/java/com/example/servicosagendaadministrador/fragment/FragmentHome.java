@@ -1,11 +1,13 @@
 package com.example.servicosagendaadministrador.fragment;
 
+import android.app.Activity;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -29,12 +33,19 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.servicosagendaadministrador.R;
+import com.example.servicosagendaadministrador.modelo.Empresa;
 import com.example.servicosagendaadministrador.util.Util;
+import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,6 +64,9 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
     private ValueEventListener valueEventListener;
 
     private CardView cardView_AlterarDados;
+
+    private Empresa empresaDados = new Empresa();
+    private Uri uri = null;
 
     //private String latitude, longitude;
 
@@ -130,16 +144,81 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         switch (v.getId()){
 
             case R.id.imgView_Home:
-                Toast.makeText(getContext(), "Abrir Galaria de Imagens", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), "Abrir Galaria de Imagens", Toast.LENGTH_LONG).show();
+                obterImage_Galeria();
             break;
 
             case R.id.cardView_Home_AlterarDados:
-                Toast.makeText(getContext(), "Alterar Dados", Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), "Alterar Dados", Toast.LENGTH_LONG).show();
+                validarDadosAlterados();
             break;
         }
     }
 
-    //---------------------------------------OUVINTE FIREBASE--------------------------------------------------
+    //--------------------------------------- OBTER IMAGENS GALERIA --------------------------------------------------
+
+    private void obterImage_Galeria() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        //startActivityForResult(Intent.createChooser(intent, "Escolhe uma imagem"), 10);
+        openActivity.launch(intent);
+    }
+
+    //--------------------------------------- ALTERAR DADOS -----------------------------------------------------
+
+    private void validarDadosAlterados(){
+
+        String info = editTxt_Info.getText().toString();
+        String valor = editTxt_ValorServico.getText().toString();
+        String numero = editTxt_Contato.getText().toString();
+
+        if(!info.isEmpty() && !valor.isEmpty() && !numero.isEmpty()){
+
+            if (empresaDados.getInformacao().equals(info) &&
+                    empresaDados.getValorServico().equals(valor) && empresaDados.getNumeroContato().equals(numero) && uri == null){
+                Toast.makeText(getContext(), "Você não alterou nenhuma informação", Toast.LENGTH_LONG).show();
+            }else{
+
+                //Toast.makeText(getContext(), "Gravar Dados", Toast.LENGTH_LONG).show();
+
+                if(uri != null){ // verificando se image esta null
+                    Toast.makeText(getContext(), "Altera a imagem", Toast.LENGTH_LONG).show();
+                    alterarImgStorage();
+                }else{
+                    Toast.makeText(getContext(), "Altera a somente os textos", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        }else{
+            Toast.makeText(getContext(), "Preencha todos os campos obrigatório", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void alterarImgStorage() {
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+
+        // nome da pasta no bd firebase
+        StorageReference storageReference = storage.getReference().child("imagemlogo");
+        // nome da imagem no bd firebase
+        StorageReference nomeImg = storageReference.child("LogoEmpresa" + System.currentTimeMillis() + ".png");
+
+        UploadTask uploadTask = nomeImg.putFile(uri);
+
+        //fazendo upload imagem
+        uploadTask.addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                if(task.isSuccessful()){
+                    Toast.makeText(getContext(), "Upload Ok", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(getContext(), "Falha no Upload", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    //--------------------------------------- OUVINTE FIREBASE --------------------------------------------------
 
     private void ouvinte(){
 
@@ -152,20 +231,15 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
 
                     if(dataSnapshot.exists()){
 
-                        // pegando as referencia dos valores no bd do firebase
-                        String imagemUrl = dataSnapshot.child("imagemUrl").getValue(String.class);
-                        String info = dataSnapshot.child("informacao").getValue(String.class);
-                        String latitude = dataSnapshot.child("latitude").getValue(String.class);
-                        String longitude = dataSnapshot.child("longitude").getValue(String.class);
-                        String numeroContato = dataSnapshot.child("numeroContato").getValue(String.class);
-                        String valorServico = dataSnapshot.child("valorServico").getValue(String.class);
+                        // pegando as referencia dos valores no class enpresa
+                        Empresa empresa = dataSnapshot.getValue(Empresa.class);
 
-                        Log.i("ouvinte latitude", "ouvinte latitude: " + latitude);
+                        //atribuindo os valores
+                        empresaDados = empresa;
 
-                        if(!info.isEmpty() && !valorServico.isEmpty()){
-                            updateDados(imagemUrl, info, latitude, longitude, numeroContato, valorServico);
+                        if(!empresa.getInformacao().isEmpty() && !empresa.getValorServico().isEmpty()){
+                            updateDados(empresa);
                         }
-
                     }
                 }
 
@@ -179,15 +253,14 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void updateDados(String imagemUrl, String info, String latitudeFirebase, String longitudeFirebase,
-                                        String numeroContato, String valorServico){
+    private void updateDados(Empresa empresa){
 
         // add info que estal bd do firebase nas variavies
-        editTxt_Info.setText(info);
-        editTxt_ValorServico.setText(valorServico);
-        editTxt_Contato.setText(numeroContato);
+        editTxt_Info.setText(empresa.getInformacao());
+        editTxt_ValorServico.setText(empresa.getValorServico());
+        editTxt_Contato.setText(empresa.getNumeroContato());
 
-        Glide.with(getContext()).asBitmap().load(imagemUrl).listener(new RequestListener<Bitmap>() {
+        Glide.with(getContext()).asBitmap().load(empresa.getImagemUrl()).listener(new RequestListener<Bitmap>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
 
@@ -207,8 +280,47 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
             }
 
         }).into(imgView);
-
     }
+
+    //--------------------------------------- Activity Result Launcher --------------------------------------------------
+
+    ActivityResultLauncher<Intent> openActivity = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+
+                if(result.getResultCode() == Activity.RESULT_OK){
+
+                    Intent data = result.getData();
+                    int requestCode = 10;
+
+                    if(requestCode == 10){
+
+                        if(data != null){
+
+                            Uri uriImg = data.getData();
+                            uri = uriImg;
+
+                            Glide.with(getContext()).asBitmap().load(uriImg).listener(new RequestListener<Bitmap>() {
+
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Bitmap> target, boolean isFirstResource) {
+
+                                    Toast.makeText(getContext(), "Erro ao selecionar imagem", Toast.LENGTH_LONG).show();
+
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onResourceReady(Bitmap resource, Object model, Target<Bitmap> target, DataSource dataSource, boolean isFirstResource) {
+                                    return false;
+                                }
+                            }).into(imgView);
+                        }
+                    }
+
+                }
+            }
+    );
 
     //---------------------------------------CICLO DE VIDA FRAGMENT--------------------------------------------
 
