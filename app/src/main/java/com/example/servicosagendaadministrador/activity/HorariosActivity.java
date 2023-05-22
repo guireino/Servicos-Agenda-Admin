@@ -4,15 +4,16 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.servicosagendaadministrador.R;
-import com.example.servicosagendaadministrador.adapter.AdapterListView;
+import com.example.servicosagendaadministrador.adapter.AdapterRecyclerView;
 import com.example.servicosagendaadministrador.util.Util;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -24,10 +25,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HorariosActivity extends AppCompatActivity implements AdapterListView.ClickItemListView {
+public class HorariosActivity extends AppCompatActivity implements AdapterRecyclerView.ClickItemRecyclerView {
 
-    private ListView listView;
-    private AdapterListView adapterListView;
+    private RecyclerView recyclerView;
+    private AdapterRecyclerView adapterRecyclerView;
 
     // variavel responsavel para armezenar informacao bd numa list
     private List<String> horarios = new ArrayList<>();
@@ -46,13 +47,12 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
 
         //horarios.add("7:00 Hrs");
 
-        listView = (ListView)findViewById(R.id.listView);
+        recyclerView = findViewById(R.id.recyclerView);
 
         database = FirebaseDatabase.getInstance();
-
         data = getIntent().getStringArrayListExtra("data");
 
-        configurarListView();
+        configurarRecyclerView();
 
         carregarHorarioFuncionamento();
         //buscarHorariosReservados();
@@ -61,14 +61,15 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
                                   //  + data.get(0) + "\nMes: " + data.get(1) + "\nAno: " + data.get(2), Toast.LENGTH_LONG).show();
     }
 
-    // ----------------------------------------------- CONFIGURAR LISTVIEW -----------------------------------------------
+    // ----------------------------------------------- CONFIGURAR RECYCLERVIEW -------------------------------------------------
 
-    private void configurarListView(){
+    private void configurarRecyclerView(){
 
-        //adapterlist que faz lista funcionar
-        adapterListView = new AdapterListView(this, horarios, this);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        listView.setAdapter(adapterListView);
+        adapterRecyclerView = new AdapterRecyclerView(this, horarios, this);
+
+        recyclerView.setAdapter(adapterRecyclerView);
     }
 
     // ----------------------------------------------- CARREGAR HORARIOS EMPRESA -----------------------------------------------
@@ -85,7 +86,7 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
 
                 if(dataSnapshot.exists()){
 
-                    // buscando todo os valores bd na pasta Calendario
+                    // buscando todo os valores bd na pasta Calendario do firebase
                     for (DataSnapshot snapshot: dataSnapshot.getChildren()){
 
                         String horario = snapshot.getValue(String.class);
@@ -94,7 +95,8 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
                         horariosTemp.add(horario);
                     }
 
-                    adapterListView.notifyDataSetChanged();
+                    adapterRecyclerView.notifyDataSetChanged();
+                    //adapterListView.notifyDataSetChanged();
                     buscarHorariosReservados();
                 }
             }
@@ -131,7 +133,7 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
                     String horarioKey = key + " - Reservado";
                     horarios.set(index, horarioKey);
 
-                    adapterListView.notifyDataSetChanged();
+                    adapterRecyclerView.notifyDataSetChanged();
 
                     // horario temos 5 itens = horarios.get(1) == 08:00 Hrs
                     // horario temos 5 itens = horarios.get(0) == 07:00 Hrs
@@ -154,7 +156,8 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
 
                     horarios.set(index, key);
 
-                    adapterListView.notifyDataSetChanged();
+                    adapterRecyclerView.notifyDataSetChanged();
+                    //adapterListView.notifyDataSetChanged();
                 }
 
                 @Override
@@ -174,6 +177,7 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
 
     // ----------------------------------------------- CLICK ITEM DA LISTA -----------------------------------------------
 
+
     @Override
     public void clickItem(String horario, int position) {
 
@@ -185,20 +189,6 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
 
         //Toast.makeText(getBaseContext(), horario, Toast.LENGTH_LONG).show();
     }
-
-    /*
-
-    private void consultarHorarioSelecionado(String horario, int position) {
-
-        if(horario.contains("Reservado")){
-            Toast.makeText(getBaseContext(), "Ja existe um agendamento para esse horario", Toast.LENGTH_LONG).show();
-        }else{
-            Toast.makeText(getBaseContext(), "Agendamento Disponivel", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    */
-
 
     private void consultarHorarioBancoDados(String horario, int position){
 
@@ -214,18 +204,11 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
 
                 if(dataSnapshot.exists()){
 
-                    String emailRecuperadoBD = dataSnapshot.child("email").getValue(String.class);
-
-                    String emailDispositivoUsuario = obterEmail();
-
-                    if(emailRecuperadoBD.equals(emailDispositivoUsuario)){
-                        Toast.makeText(getBaseContext(), "O e-mail e Igual você pode alterar ou Remover os dados", Toast.LENGTH_LONG).show();
-                    }else{
-                        Toast.makeText(getBaseContext(), "Não foi você quem faz o agendamento", Toast.LENGTH_LONG).show();
-                    }
+                    Toast.makeText(getBaseContext(), "Ja esta reservaso - Exibir Dados do Cliente", Toast.LENGTH_LONG).show();
 
                 }else{
-                    //Toast.makeText(getBaseContext(), "Agendamento Disponivel", Toast.LENGTH_LONG).show();
+
+                    Toast.makeText(getBaseContext(), "Agendamento Disponivel", Toast.LENGTH_LONG).show();
 
                     Intent intent = new Intent(getBaseContext(), AgendamentoServicoActivity.class);
 
@@ -237,7 +220,6 @@ public class HorariosActivity extends AppCompatActivity implements AdapterListVi
                     data.add(3, horario);
 
                     intent.putExtra("data", data); // inserino valor tela
-
                     startActivity(intent);
                 }
             }

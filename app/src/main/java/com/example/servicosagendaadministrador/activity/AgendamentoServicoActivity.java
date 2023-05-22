@@ -1,21 +1,12 @@
 package com.example.servicosagendaadministrador.activity;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.PendingIntent;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -23,9 +14,6 @@ import com.example.servicosagendaadministrador.R;
 import com.example.servicosagendaadministrador.modelo.Agendamento;
 import com.example.servicosagendaadministrador.util.DialogProgress;
 import com.example.servicosagendaadministrador.util.Util;
-import com.google.android.gms.auth.api.credentials.CredentialPickerConfig;
-import com.google.android.gms.auth.api.credentials.Credentials;
-import com.google.android.gms.auth.api.credentials.HintRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
@@ -35,12 +23,9 @@ import java.util.ArrayList;
 
 public class AgendamentoServicoActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText editTxt_Nome;
-    private TextView txtView_NumeroContato, txtView_Email;
+    private EditText editTxt_Nome, editView_NumeroContato, editView_Email;
     private CheckBox checkBox_WhatsApp, checkBox_Barba, checkBox_Cabelo;
     private CardView cardView_Agendar;
-
-    //private GoogleApiClient googleApiClient_Numero;
 
     private ArrayList<String> data = new ArrayList<String>();
 
@@ -55,25 +40,14 @@ public class AgendamentoServicoActivity extends AppCompatActivity implements Vie
         //        + "\nDia: " + data.get(0) + "\nHorario: " + data.get(3), Toast.LENGTH_LONG).show();
 
         editTxt_Nome = findViewById(R.id.edTxt_Agendamento_Nome);
-        txtView_NumeroContato = findViewById(R.id.txtView_AgendamentoServico_Numero);
-        txtView_Email = findViewById(R.id.txtView_AgendamentoServico_Email);
+        editView_NumeroContato = findViewById(R.id.editView_Home_NumeroContatos);
+        editView_Email = findViewById(R.id.editTxt_AgendamentoServico_Email);
         checkBox_WhatsApp = findViewById(R.id.checkbox_AgendamentoServico_WhatsApp);
         checkBox_Barba = findViewById(R.id.checkbox_AgendamentoServico_Barba);
         checkBox_Cabelo = findViewById(R.id.checkbox_AgendamentoServico_Cabelo);
         cardView_Agendar = findViewById(R.id.cardView_AgendamentoServico_Agendar);
 
         cardView_Agendar.setOnClickListener(this); // add click cardView
-
-        /*
-        // configuracao com metodo googleApiClient
-        googleApiClient_Numero = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .enableAutoManage(this, this)
-                .addApi(Auth.CREDENTIALS_API).build();
-        */
-
-        obterNumeroContato();
-        obterEmail();
 
     }
 
@@ -93,97 +67,13 @@ public class AgendamentoServicoActivity extends AppCompatActivity implements Vie
         }
     }
 
-    // ======================================= OBTER NUMERO TELEFONE =======================================
-
-    private void obterNumeroContato() {
-
-        // fazendo requisição para exibir na tela do celular para client escolhar numero
-        HintRequest hintRequest = new HintRequest.Builder().setHintPickerConfig(
-                new CredentialPickerConfig.Builder().setShowCancelButton(false).build())
-                .setPhoneNumberIdentifierSupported(true).build();
-
-        //PendingIntent intent = Auth.CredentialsApi.getHintPickerIntent(googleApiClient_Numero, hintRequest);
-
-        // fazendo comunicação insterna com numero client
-        PendingIntent intent = Credentials.getClient(this).getHintPickerIntent(hintRequest);
-
-        try {
-            // 123 codigo call conversa com galeria para abrir na tela do celular para client escolhar numero
-            startIntentSenderForResult(intent.getIntentSender(), 123, null, 0, 0, 0);
-        } catch (IntentSender.SendIntentException e) {
-            e.printStackTrace();
-        }
-    }
-
-    // ======================================= OBTER EMAIL =======================================
-
-    private void obterEmail() {
-
-        AccountManager accountManager = AccountManager.get(this);
-        Account[] accounts = accountManager.getAccounts();
-
-        for (Account account: accounts){
-
-            String email = account.name; // email = test@gmail.com
-
-            if(email.contains("@")){ // ele so vai cair nesse if se tiver @ escrito
-                txtView_Email.setText(email); // add text
-                break; // break e para sair do for
-            }
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == 123){
-            if(resultCode == RESULT_OK){
-
-                com.google.android.gms.auth.api.credentials.Credential credential = data.getParcelableExtra(
-                        com.google.android.gms.auth.api.credentials.Credential.EXTRA_KEY);
-
-                if(!credential.getId().isEmpty()){
-                    txtView_NumeroContato.setText(credential.getId());
-                }else{
-                    Toast.makeText(getBaseContext(), "Escolha um numero de contato para poder continuar", Toast.LENGTH_LONG).show();
-                }
-            }else{ // se cliente nao escolher numero
-                dialogNumeroContato();
-            }
-        }
-    }
-
-    private void dialogNumeroContato() {
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle("Escolha Obrigatoria")
-                .setMessage("Escolha um número de telefone para agendar um horário.")
-                .setCancelable(false)
-                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        obterNumeroContato();
-                    }
-
-                }).setNegativeButton("Sair", new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int i) {
-                        finish();
-                    }
-                });
-
-        builder.show();
-    }
-
     // ======================================= AGENDAR NO FIREBASE =======================================
 
     private void agendar(){
 
         String nome = editTxt_Nome.getText().toString();
-        String contato = txtView_NumeroContato.getText().toString();
-        String email = txtView_Email.getText().toString();
+        String contato = editView_NumeroContato.getText().toString();
+        String email = editView_Email.getText().toString();
 
         boolean whatsApp = checkBox_WhatsApp.isChecked();
         boolean barba = checkBox_Barba.isChecked();
@@ -243,8 +133,5 @@ public class AgendamentoServicoActivity extends AppCompatActivity implements Vie
            }
        });
     }
-
-    // ======================================= METODOS DE GOOGLE =======================================
-
 
 }

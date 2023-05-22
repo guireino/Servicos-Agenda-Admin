@@ -40,11 +40,10 @@
                         android:textSize="30sp"
                         android:textStyle="bold" />
 
-                    <TextView android:id="@+id/txtView_AgendamentoServico_Numero"
-                        android:layout_width="wrap_content"
+                    <EditText android:id="@+id/editTxt_AgendamentoServico_Numero"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
-                        android:text="(066) 98456-4875 "
                         android:textSize="30sp"
                         android:textStyle="bold" />
 
@@ -65,10 +64,9 @@
                         android:textSize="30sp"
                         android:textStyle="bold" />
 
-                    <TextView android:id="@+id/txtView_AgendamentoServico_Email"
-                        android:layout_width="wrap_content"
+                    <EditText android:id="@+id/editTxt_AgendamentoServico_Email"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="gui@gmail.com"
                         android:textSize="30sp"
                         android:textStyle="bold" />
 

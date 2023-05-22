@@ -34,6 +34,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.servicosagendaadministrador.R;
 import com.example.servicosagendaadministrador.modelo.Empresa;
+import com.example.servicosagendaadministrador.util.DialogProgress;
 import com.example.servicosagendaadministrador.util.Util;
 import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -46,6 +47,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -171,29 +175,46 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         String valor = editTxt_ValorServico.getText().toString();
         String numero = editTxt_Contato.getText().toString();
 
-        if(!info.isEmpty() && !valor.isEmpty() && !numero.isEmpty()){
+        if(Util.statusInternet_MoWi(getContext())){
 
-            if (empresaDados.getInformacao().equals(info) &&
-                    empresaDados.getValorServico().equals(valor) && empresaDados.getNumeroContato().equals(numero) && uri == null){
-                Toast.makeText(getContext(), "Você não alterou nenhuma informação", Toast.LENGTH_LONG).show();
-            }else{
+            if(!info.isEmpty() && !valor.isEmpty() && !numero.isEmpty()){
 
-                //Toast.makeText(getContext(), "Gravar Dados", Toast.LENGTH_LONG).show();
-
-                if(uri != null){ // verificando se image esta null
-                    Toast.makeText(getContext(), "Altera a imagem", Toast.LENGTH_LONG).show();
-                    alterarImgStorage();
+                if (empresaDados.getInformacao().equals(info) &&
+                        empresaDados.getValorServico().equals(valor) && empresaDados.getNumeroContato().equals(numero) && uri == null){
+                    Toast.makeText(getContext(), "Você não alterou nenhuma informação", Toast.LENGTH_LONG).show();
                 }else{
-                    Toast.makeText(getContext(), "Altera a somente os textos", Toast.LENGTH_LONG).show();
+
+                    //Toast.makeText(getContext(), "Gravar Dados", Toast.LENGTH_LONG).show();
+
+                    String imgUrl = empresaDados.getImagemUrl();
+                    String latitude = empresaDados.getLatitude();
+                    String longitude = empresaDados.getLongitude();
+
+                    if(uri != null){ // verificando se image esta null
+                        //Toast.makeText(getContext(), "Altera a imagem", Toast.LENGTH_LONG).show();
+                        alterarImgStorage(info, valor, numero, latitude, longitude);
+                    }else{
+
+                        //Toast.makeText(getContext(), "Altera a somente os textos", Toast.LENGTH_LONG).show();
+                        alterarDadosDatabase(info, valor, numero, imgUrl, latitude, longitude);
+                    }
                 }
+
+            }else{
+                Toast.makeText(getContext(), "Preencha todos os campos obrigatório", Toast.LENGTH_LONG).show();
             }
 
         }else{
-            Toast.makeText(getContext(), "Preencha todos os campos obrigatório", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Erro - Verifique se você possui alguma conexão com a Internet", Toast.LENGTH_LONG).show();
         }
     }
 
-    private void alterarImgStorage() {
+    //--------------------------------------- ALTERAR IMAGEM NO STORAGE -----------------------------------------------------
+
+    private void alterarImgStorage(final String info,final String valor,final String numero,final String latitude,final String longitude) {
+
+        DialogProgress dialogProgress = new DialogProgress();
+        dialogProgress.show(getChildFragmentManager(), "");
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
@@ -202,6 +223,7 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
         // nome da imagem no bd firebase
         StorageReference nomeImg = storageReference.child("LogoEmpresa" + System.currentTimeMillis() + ".png");
 
+        // uploadTask e que vai fazer conunicacao app para firebase
         UploadTask uploadTask = nomeImg.putFile(uri);
 
         //fazendo upload imagem
@@ -210,9 +232,61 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
             public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
 
                 if(task.isSuccessful()){
-                    Toast.makeText(getContext(), "Upload Ok", Toast.LENGTH_LONG).show();
+
+                    //Toast.makeText(getContext(), "Upload Ok", Toast.LENGTH_LONG).show();
+                    nomeImg.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+
+                            if(task.isSuccessful()){
+
+                                dialogProgress.dismiss();
+
+                                //pegando url da imagem
+                                String urlImagem = task.getResult().toString();
+
+                                alterarDadosDatabase(info, valor, numero, urlImagem, latitude, longitude);
+
+                                //Toast.makeText(getContext(), urlImagem, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
+
                 }else{
+                    dialogProgress.dismiss();
                     Toast.makeText(getContext(), "Falha no Upload", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    //--------------------------------------- ALTERAR DADOS DATABASE -----------------------------------------------------
+
+    private void alterarDadosDatabase(String info,String valor, String numero, String imgUrl, String latitude, String longitude) {
+
+        Empresa empresa = new Empresa(imgUrl, info, latitude, longitude, numero, valor); // pegando os valores class empresa
+
+        DialogProgress dialogProgress = new DialogProgress();
+        dialogProgress.show(getChildFragmentManager(), "");
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        DatabaseReference databaseReference = database.getReference().child("DB").child("Home");
+
+        // atualizando dados bd firebase
+        Map<String, Object> update = new HashMap<>();
+        update.put("Dados", empresa);
+
+        databaseReference.updateChildren(update).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(task.isSuccessful()){
+                    dialogProgress.dismiss();
+                    Toast.makeText(getContext(), "Sucesso ao Realizar Alteração", Toast.LENGTH_LONG).show();
+                }else{
+                    dialogProgress.dismiss();
+                    Toast.makeText(getContext(), "Erro ao Realizar Alteração", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -317,7 +391,6 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
                             }).into(imgView);
                         }
                     }
-
                 }
             }
     );

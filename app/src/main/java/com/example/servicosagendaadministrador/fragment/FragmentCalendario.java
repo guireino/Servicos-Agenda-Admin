@@ -161,10 +161,10 @@ public class FragmentCalendario extends Fragment implements CalendarView.OnDateC
                dataList.add(anoDisponive); // position 2
 
                // chamar a nossa proxima activity
-               //Intent intent = new Intent(getContext(), HorariosActivity.class);
-               //intent.putExtra("data", dataList);
+               Intent intent = new Intent(getContext(), HorariosActivity.class);
+               intent.putExtra("data", dataList);
 
-               //startActivity(intent);
+               startActivity(intent);
 
             }else{
                 Toast.makeText(getContext(), "Erro - Sem conexão com a internet", LENGTH_LONG).show();
