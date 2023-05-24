@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:context=".activity.AlterarRemoverServicoActivity">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="10dp"
+                android:orientation="vertical" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nome* "
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <EditText android:id="@+id/edTxt_AlterarRemover_Nome"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:textSize="30sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="13dp"
+                        android:text="Contato* "
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <EditText android:id="@+id/editTxt_AlterarRemover_Numero"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <CheckBox android:id="@+id/checkbox_AlterarRemover_WhatsApp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Possui WhatsApp"
+                        android:textSize="30sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
+                        android:buttonTint="@color/colorAccent" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Email*"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <EditText android:id="@+id/editTxt_AlterarRemover_Email"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:text="Serviço*"
+                        android:textSize="30sp"
+                        android:textStyle="bold" />
+
+                    <CheckBox android:id="@+id/checkbox_AlterarRemover_Barba"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Barba"
+                        android:textSize="30sp"
+                        android:shadowColor="@color/colorPrimary"
+                        android:buttonTint="@color/colorAccent" />
+
+                    <CheckBox android:id="@+id/checkbox_AlterarRemover_Cabelo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Cabelo"
+                        android:textSize="30sp"
+                        android:shadowColor="@color/colorPrimary"
+                        android:buttonTint="@color/colorAccent" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="30dp"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:orientation="horizontal" >
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardView_AlterarRemover_Alterar"
+                                android:layout_width="145dp"
+                                android:layout_height="55dp"
+                                android:layout_gravity="center"
+                                app:cardBackgroundColor="@color/colorPrimary"
+                                app:cardCornerRadius="2dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true"
+                                android:foreground="?attr/selectableItemBackground"
+                                android:background="@color/colorPrimary" >
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:text="Alterar"
+                                        android:textColor="@color/white"
+                                        android:textSize="27sp"
+                                        android:textStyle="bold"
+                                        android:textAlignment="center" />
+
+                            </androidx.cardview.widget.CardView>
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardView_AlterarRemover_Remover"
+                                android:layout_width="145dp"
+                                android:layout_height="55dp"
+                                android:layout_gravity="center"
+                                app:cardBackgroundColor="@color/colorPrimary"
+                                app:cardCornerRadius="2dp"
+                                app:cardElevation="2dp"
+                                app:cardUseCompatPadding="true"
+                                android:foreground="?attr/selectableItemBackground"
+                                android:background="@color/colorPrimary" >
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:text="Remover"
+                                        android:textColor="@color/white"
+                                        android:textSize="27sp"
+                                        android:textStyle="bold"
+                                        android:textAlignment="center" />
+
+                            </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+           </LinearLayout>
+        </ScrollView>
+</LinearLayout>

@@ -40,7 +40,7 @@ public class AgendamentoServicoActivity extends AppCompatActivity implements Vie
         //        + "\nDia: " + data.get(0) + "\nHorario: " + data.get(3), Toast.LENGTH_LONG).show();
 
         editTxt_Nome = findViewById(R.id.edTxt_Agendamento_Nome);
-        editView_NumeroContato = findViewById(R.id.editView_Home_NumeroContatos);
+        editView_NumeroContato = findViewById(R.id.editTxt_AgendamentoServico_Numero);
         editView_Email = findViewById(R.id.editTxt_AgendamentoServico_Email);
         checkBox_WhatsApp = findViewById(R.id.checkbox_AgendamentoServico_WhatsApp);
         checkBox_Barba = findViewById(R.id.checkbox_AgendamentoServico_Barba);
@@ -79,6 +79,7 @@ public class AgendamentoServicoActivity extends AppCompatActivity implements Vie
         boolean barba = checkBox_Barba.isChecked();
         boolean cabelo = checkBox_Cabelo.isChecked();
 
+        //verificar se variaveis esta vazias
         if(!nome.isEmpty()){
 
             if(!cabelo && !barba){

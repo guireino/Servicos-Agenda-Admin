@@ -203,8 +203,16 @@ public class HorariosActivity extends AppCompatActivity implements AdapterRecycl
             public void onDataChange(@NonNull DataSnapshot dataSnapshot){
 
                 if(dataSnapshot.exists()){
-
                     Toast.makeText(getBaseContext(), "Ja esta reservaso - Exibir Dados do Cliente", Toast.LENGTH_LONG).show();
+
+                    Intent intent = new Intent(getBaseContext(), AlterarRemoverServicoActivity.class);
+
+                    String horarioSelecionado = horariosTemp.get(position);
+
+                    data.add(3, horarioSelecionado);
+
+                    intent.putExtra("data", data);
+                    startActivity(intent);
 
                 }else{
 

@@ -69,6 +69,8 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
 
     private CardView cardView_AlterarDados;
 
+    public static boolean offlineFirebase = false;
+
     private Empresa empresaDados = new Empresa();
     private Uri uri = null;
 
@@ -111,6 +113,8 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
 
         database = FirebaseDatabase.getInstance();
 
+        iniciarModoOfflineFirebase();
+
         //buscando caminho do bd
         reference = database.getReference().child("DB").child("Home").child("Dados");
 
@@ -140,6 +144,23 @@ public class FragmentHome extends Fragment implements View.OnClickListener {
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    //--------------------------------------- MODE OFFLINE FIREBASE --------------------------------------------------
+
+    private void iniciarModoOfflineFirebase(){
+
+        try {
+            if(!offlineFirebase){
+                FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+                offlineFirebase = true;
+            }else{ //esta offline
+
+            }
+
+        }catch (Exception e){
+
+        }
     }
 
     @Override
